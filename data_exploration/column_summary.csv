@@ -1,0 +1,43 @@
+column,dtype,n_unique,n_missing
+age,int64,91,0
+class of worker,str,9,0
+detailed industry recode,int64,52,0
+detailed occupation recode,int64,47,0
+education,str,17,0
+wage per hour,int64,1240,0
+enroll in edu inst last wk,str,3,0
+marital stat,str,7,0
+major industry code,str,24,0
+major occupation code,str,15,0
+race,str,5,0
+hispanic origin,str,10,874
+sex,str,2,0
+member of a labor union,str,3,0
+reason for unemployment,str,6,0
+full or part time employment stat,str,8,0
+capital gains,int64,132,0
+capital losses,int64,113,0
+dividends from stocks,int64,1478,0
+tax filer stat,str,6,0
+region of previous residence,str,6,0
+state of previous residence,str,51,0
+detailed household and family stat,str,38,0
+detailed household summary in household,str,8,0
+weight,float64,99800,0
+migration code-change in msa,str,10,0
+migration code-change in reg,str,9,0
+migration code-move within reg,str,10,0
+live in this house 1 year ago,str,3,0
+migration prev res in sunbelt,str,4,0
+num persons worked for employer,int64,7,0
+family members under 18,str,5,0
+country of birth father,str,43,0
+country of birth mother,str,43,0
+country of birth self,str,43,0
+citizenship,str,5,0
+own business or self employed,int64,3,0
+fill inc questionnaire for veteran's admin,str,3,0
+veterans benefits,int64,3,0
+weeks worked in year,int64,53,0
+year,int64,2,0
+label,str,2,0
