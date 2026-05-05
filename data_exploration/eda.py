@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import matplotlib.pyplot as plt
 
 ################################
 # EDA display toggles
@@ -97,6 +98,115 @@ def summarize_columns(df):
     return summary_df
 
 
+def clean_filename(name):
+    """Convert a column name into a simple figure filename."""
+    return str(name).strip().replace(" ", "_").replace("'", "")
+
+def plot_one_feature(df, col, bins="auto"):
+    """Plot one feature and save the figure."""
+    s = df[col]
+    save_name = clean_filename(col)
+
+    n_missing = s.isna().sum()
+    missing_pct = n_missing / len(s) * 100
+
+    plt.figure(figsize=(10, 5))
+
+    if pd.api.types.is_numeric_dtype(s):
+        non_missing = s.dropna()
+
+        # Use matplotlib directly because pandas hist may not handle bins="auto" reliably.
+        plt.hist(non_missing, bins=bins, edgecolor="black")
+
+        min_val = non_missing.min()
+        max_val = non_missing.max()
+        plt.grid()
+
+        plt.title(
+            f"Histogram: {col}\n"
+            f"missing={n_missing} ({missing_pct:.2f}%), "
+            f"min={min_val:g}, max={max_val:g}"
+        )
+        save_path = FIGURE_DIR / f"{save_name}_histogram.png"
+
+    else:
+        value_counts = s.value_counts(dropna=False)
+        value_counts.index = [
+            "Missing" if pd.isna(x) else str(x)
+            for x in value_counts.index
+        ]
+
+        value_counts.plot(kind="bar")
+        plt.grid()
+
+        plt.title(
+            f"Value Counts: {col}\n"
+            f"missing={n_missing} ({missing_pct:.2f}%), "
+            f"n_unique={s.nunique(dropna=False)}"
+        )
+        plt.xticks(rotation=45, ha="right")
+        save_path = FIGURE_DIR / f"{save_name}_value_counts.png"
+
+    plt.xlabel(col)
+    plt.ylabel("Count")
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    print(f"Saved figure: {save_path}")
+
+
+def inspect_one_feature(df, col):
+    """Print basic EDA information for one selected feature."""
+    print("\n" + "=" * 80)
+    print(f"Feature: {col}")
+    print(f"dtype: {df[col].dtype}")
+    print(f"n_unique: {df[col].nunique(dropna=False)}")
+    print(f"n_missing: {df[col].isna().sum()}")
+
+    print("\n--- Value counts ---")
+    # Do not sort here because categorical columns may mix strings and NaN.
+    print(df[col].value_counts(dropna=False))
+
+    if pd.api.types.is_numeric_dtype(df[col]):
+        print("\n--- Numeric summary ---")
+        print(df[col].describe())
+
+    plot_one_feature(df, col)
+
+
+def weighted_value_counts(df, col, weight_col="weight"):
+    """Compute weighted counts and percentages for a categorical column."""
+    out = (
+        df.groupby(col, dropna=False)[weight_col]
+        .sum()
+        .reset_index(name="weighted_count")
+    )
+    out["weighted_pct"] = out["weighted_count"] / out["weighted_count"].sum()
+    return out.sort_values("weighted_count", ascending=False)
+
+
+def compare_weighted_unweighted_counts(df, col, weight_col="weight"):
+    """Compare raw record counts with survey-weighted counts for a categorical column."""
+    raw = (
+        df[col]
+        .value_counts(dropna=False)
+        .reset_index()
+    )
+    raw.columns = [col, "raw_count"]
+    raw["raw_pct"] = raw["raw_count"] / raw["raw_count"].sum()
+
+    weighted = weighted_value_counts(df, col, weight_col)
+
+    out = raw.merge(weighted, on=col, how="outer")
+    out = out.sort_values("weighted_count", ascending=False)
+
+    print(f"\n--- Weighted vs unweighted: {col} ---")
+    print(out)
+
+    return out
+
+
 def main():
     setup_directories()
 
@@ -119,6 +229,22 @@ def main():
     print(df.head())
 
     summary_df = summarize_columns(df)
+
+    # inspect one feature
+
+    feature_name=column_names[41]
+    inspect_one_feature(df, feature_name)
+    #df_nonzero = df[df[feature_name] != 0]
+    #inspect_one_feature(df_nonzero, feature_name)
+
+    for c in column_names:
+        compare_weighted_unweighted_counts(df, c)
+    #compare_weighted_unweighted_counts(df, "education")
+    #compare_weighted_unweighted_counts(df, "class of worker")
+    #compare_weighted_unweighted_counts(df, "sex")
+    
+
+
 
 
     
