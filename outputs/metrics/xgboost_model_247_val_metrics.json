@@ -1,0 +1,33 @@
+{
+    "model_name": "xgboost_model_247",
+    "split": "val",
+    "accuracy": 0.905239240844694,
+    "roc_auc": 0.9548040704616095,
+    "classification_report": {
+        "0": {
+            "precision": 0.9887283572839601,
+            "recall": 0.9093370382245022,
+            "f1-score": 0.9473723277909739,
+            "support": 28071.0
+        },
+        "1": {
+            "precision": 0.3809292143030893,
+            "recall": 0.8432956381260097,
+            "f1-score": 0.524798927613941,
+            "support": 1857.0
+        },
+        "accuracy": 0.905239240844694,
+        "macro avg": {
+            "precision": 0.6848287857935247,
+            "recall": 0.8763163381752559,
+            "f1-score": 0.7360856277024574,
+            "support": 29928.0
+        },
+        "weighted avg": {
+            "precision": 0.951015078464277,
+            "recall": 0.905239240844694,
+            "f1-score": 0.9211521057872065,
+            "support": 29928.0
+        }
+    }
+}
